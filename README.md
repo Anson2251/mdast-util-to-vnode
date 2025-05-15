@@ -4,92 +4,21 @@ mdast utility to get the vue vnode
 
 ## What is this?
 
-This package is a utility that takes [mdast](https://github.com/syntax-tree/mdast) input and turns it into an [Vue.js](https://github.com/vuejs/core) VNode.
+This package is a custom fork of [mdast-util-to-vnode](https://github.com/litingyes/mdast-util-to-vnode) with breaking changes in these areas:
 
-## When should I use this?
+- **Table rendering**: Tables now render headers and bodies in separate HTML tags (`<thead>` and `<tbody>`)
 
-If you want to use Vue.js to render mdast, use it. It is especially useful when you want to render streamed MarkDown strings in AI application development.
-
-## Install
-
-```bash
-npm install mdast-util-to-vnode
-```
-
-## Use
-
-Say we have the following markdown file `example.md`:
-
-```md
-# Heading
-
-`mdast-util-to-vnode` is a mdast utility to get the vue vnode.
-```
-
-And our module `example.js` looks as follows:
-
-```js
-import fs from 'node:fs/promises'
-import { fromMarkdown } from 'mdast-util-from-markdown'
-import { toVNode } from 'mdast-util-to-vnode'
-
-const doc = await fs.readFile('example.md')
-const vnode = toVNode(fromMarkdown(doc))
-
-console.log(vnode)
-```
-
-Now running node example.js yields (some info removed for brevity):
-
-```json
-{
-  "type": "div",
-  "props": null,
-  "key": null,
-  "children": [
-    {
-      "type": "h1",
-      "props": null,
-      "key": null,
-      "children": [
-        {
-          "props": null,
-          "key": null,
-          "children": "Heading"
-        }
-      ]
-    },
-    {
-      "type": "p",
-      "props": null,
-      "key": null,
-      "children": [
-        {
-          "type": "code",
-          "props": null,
-          "key": null,
-          "children": "mdast-util-to-vnode"
-        },
-        {
-          "props": null,
-          "key": null,
-          "children": " is a mdast utility to get the vue vnode."
-        }
-      ]
-    }
-  ]
-}
-```
+- **Function slots**: To address Vue 3 warnings, all non-function slots have been converted to functional slots
 
 ## API
 
 This package exports the identifier `toVNode`. There is no default export.
 
-### toVNode(mdast[, options])
+`toVNode(mdast[, options])`
 
-#### options
+### Options
 
-Support passing in custom Vue components to override mdast nodes.
+This package allows passing custom Vue components to override default mdast node rendering.
 
 ```ts
 export type ComponentReturn = Component | [Component, Record<string, any> | undefined]
@@ -99,3 +28,20 @@ export interface ToVNodeOptions {
   ((node: Node) => ComponentReturn)>>
 }
 ```
+
+### Example Usage
+
+```ts
+const vNode = toVNode(tree, {
+  components: {
+    // Custom components for different node types
+    heading: MyHeadingComponent,
+    code: MyCodeComponent,
+    // ...other component overrides
+  }
+})
+```
+
+---
+
+Last Update: 2025-04-15
